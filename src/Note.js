@@ -4,12 +4,41 @@ import FaTrash from 'react-icons/lib/fa/trash'
 import FaFloppyO from 'react-icons/lib/fa/floppy-o'
 
 class Note extends Component {
-	constructor(props) {
+    constructor(props) {
 		super(props)
 		this.state = {
-			editing: false
+			editing: false,
+        }
+	}
+
+	componentWillMount = () => {
+		this.style = {
+			right: this.randomBetween(0, window.innerWidth - 150, 'px'),
+			top: this.randomBetween(0, window.innerHeight - 150, 'px'),
+			transform: `rotate(${this.randomBetween(-25, 25, 'deg')})`,
 		}
 	}
+
+	randomBetween = (x, y, s) => {
+		return x + Math.ceil(Math.random() * (y-x)) + s
+	}
+
+	componentDidUpdate = () => {
+		var textArea
+		if(this.state.editing) {
+			textArea = this._newText
+			textArea.focus()
+			textArea.select()
+		}
+
+	}
+
+	shouldComponentUpdate = (nextProps, nextState) => {
+		return (
+			this.props.children !== nextProps.children || this.state !== nextState
+		)
+	}
+
 	edit = () => {
 		this.setState({
 			editing: true
@@ -19,6 +48,11 @@ class Note extends Component {
 	remove = () => {
 		this.props.onRemove(this.props.index)
 	}
+
+	top = () => {
+
+    }
+
 
 	save = (e) => {
 		e.preventDefault()
@@ -30,9 +64,10 @@ class Note extends Component {
 
 	renderForm = () => {
 		return (
-			<div className="note">
+			<div className="note" style={this.style} onClick={this.top}>
 				<form onSubmit={this.save}>
-					<textarea ref={input => this._newText = input}/>
+					<textarea ref={input => this._newText = input}
+							  defaultValue={this.props.children}/>
 					<button id="save"><FaFloppyO /></button>
 				</form>
 			</div>
@@ -41,7 +76,7 @@ class Note extends Component {
 
 	renderDisplay = () => {
 		return (
-			<div className="note">
+			<div className="note" style={this.style} onClick={this.top}>
 				<p>{this.props.children}</p>
 				<span>
 					<button onClick={this.edit} id="edit"><FaPencil /></button>
